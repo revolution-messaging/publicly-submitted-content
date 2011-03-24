@@ -30,7 +30,7 @@ function psc_show_form( $atts ){
 			$content = '';
 			$meta = array();
 			foreach($fields as $key => $field) {
-				if($field['required']=='yes' && (!isset($_POST[$field['slug']]) || empty($_POST[$field['slug']]))) {
+				if($field['required']=='yes' && (!isset($_POST[$field['slug']]) || empty($_POST[$field['slug']])) && $field['type']!='file') {
 					$fields[$key]['error'] = true;
 					$any_errors = true;
 				} else if(isset($_POST[$field['slug']]) && !empty($_POST[$field['slug']])) {
@@ -53,17 +53,26 @@ function psc_show_form( $atts ){
 				// save post
 				$post_id = psc_create_post($content='', $post_category=1, $status='pending', $post_type='post');
 				
-				// save attachment
-				if(isset($attachment)) {
-					psc_save_attachment($attachment, $post_id);
+				if($post_id===false) {
+					$any_errors = true;
+				} else {
+					// save attachment
+					if(isset($attachment)) {
+						insert_attachment($attachment['field']['slug'], $post_id);
+					}
+					
+					// save meta
+					foreach($meta as $key => $value) {
+						add_post_meta($post_id, $key, $value, true);
+					}
+					
+					// clear $_POST
+					$_POST = array();
+					
+					// thanks page, else render the form again with errors
+					header('Location: http://wordpress.dev/thanks');
+					exit();
 				}
-				
-				// save meta
-				foreach($meta as $key => $value) {
-					add_post_meta($post_id, $key, $value, true);
-				}
-				
-				// thanks page, else render the form again with errors
 			}
 		} else if(!empty($_POST) && !wp_verify_nonce($_POST['psc_add'], 'psc_nonce_field')) {
 			$psc_error = true;
@@ -78,8 +87,18 @@ function psc_show_form( $atts ){
 			switch($field['type']) {
 				case 'text':
 					$form_fields .= '
-						<div class="input">
-							<label for="'.$field['slug'].'">'.$field['label'].'</label>
+						<div class="input';
+					if(isset($field['error']) && $field['error']===true) {
+						$form_fields .= ' error';
+					}
+					$form_fields .= '">';
+					if(isset($field['error']) && $field['error']===true) {
+						$form_fields .= '<div class="errMsg">This field cannot be left blank.</div>';
+					}
+					$form_fields .= '
+							<label for="'.$field['slug'].'">'.$field['label'];
+					if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+					$form_fields .= '</label>
 							<input type="text" name="'.$field['slug'].'" id="'.$field['slug'].'" />
 						</div>
 					';
@@ -87,8 +106,18 @@ function psc_show_form( $atts ){
 				case 'file':
 					$file = true;
 					$form_fields .= '
-						<div class="file">
-							<label for="'.$field['slug'].'">'.$field['label'].'</label>
+						<div class="file';
+						if(isset($field['error']) && $field['error']===true) {
+							$form_fields .= ' error';
+						}
+						$form_fields .= '">';
+						if(isset($field['error']) && $field['error']===true) {
+							$form_fields .= '<div class="errMsg">This field cannot be left blank.</div>';
+						}
+						$form_fields .= '
+								<label for="'.$field['slug'].'">'.$field['label'];
+						if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+						$form_fields .= '</label>
 							<input type="file" name="'.$field['slug'].'" id="'.$field['slug'].'" />
 						</div>
 					';
@@ -98,54 +127,102 @@ function psc_show_form( $atts ){
 					break;
 				case 'password':
 					$form_fields .= '
-					<div class="password">
-						<label for="'.$field['slug'].'">'.$field['label'].'</label>
-						<input type="password" name="'.$field['slug'].'" id="'.$field['slug'].'" />
+					<div class="password	';
+						if(isset($field['error']) && $field['error']===true) {
+							$form_fields .= ' error';
+						}
+						$form_fields .= '">';
+						if(isset($field['error']) && $field['error']===true) {
+							$form_fields .= '<div class="errMsg">This field cannot be left blank.</div>';
+						}
+						$form_fields .= '
+								<label for="'.$field['slug'].'">'.$field['label'];
+						if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+						$form_fields .= '</label>
+					<input type="password" name="'.$field['slug'].'" id="'.$field['slug'].'" />
 					</div>
 					';
 					break;
 				case 'textarea':
 					$form_fields .= '
-					<div class="textarea">
-						<label for="'.$field['slug'].'">'.$field['label'].'</label>
-						<textarea name="'.$field['slug'].'" id="'.$field['slug'].'"></textarea>
+					<div class="textarea';
+					if(isset($field['error']) && $field['error']===true) {
+						$form_fields .= ' error';
+					}
+					$form_fields .= '">';
+					if(isset($field['error']) && $field['error']===true) {
+						$form_fields .= '<div class="errMsg">This field cannot be left blank.</div>';
+					}
+					$form_fields .= '
+							<label for="'.$field['slug'].'">'.$field['label'];
+					if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+					$form_fields .= '</label>
+					<textarea name="'.$field['slug'].'" id="'.$field['slug'].'"></textarea>
 					</div>
 					';
 					break;
 				case 'radio':
 					$form_fields .= '
-					<div id="psc_'.$field['slug'].'" class="radiogroup">'."\r\n";
+					<div id="psc_'.$field['slug'].'" class="radiogroup';
+					if(isset($field['error']) && $field['error']===true) {
+						$form_fields .= ' error';
+					}
+					$form_fields .= '">';
+					if(isset($field['error']) && $field['error']===true) {
+						$form_fields .= '<div class="errMsg">You must select an option.</div>';
+					}
 						$i = 0;
 						foreach($field['options'] as $key => $val) {
 							$i++;
 							$form_fields .= '<div class="radio"><input type="radio" name="'.$field['slug'].'" id="'.$i.'_'.$field['slug'].'" class="'.$field['slug'].'"> <label for="'.$i.'_'.$field['slug'].'">'.$field['label'].'</label></div>'."\r\n";
 						}
+					if($field['required']=='yes') { $form_fields .= '<div class="required">require</div>'; }
 					$form_fields .= '
 					</div>
 					';
 					break;
 				case 'select':
 					$form_fields .= '
-					<div class="select">
-						<label for="'.$field['slug'].'">'.$field['label'].'</label>
-						<select name="'.$field['slug'].'" id="'.$field['slug'].'">'."\r\n";
-						foreach($field['options'] as $key => $val) {
-							$form_fields .= '<option value="'.$key.'">'.$val.'</option>'."\r\n";
+					<div class="select';
+						if(isset($field['error']) && $field['error']===true) {
+							$form_fields .= ' error';
 						}
-					$form_fields .= '
+						$form_fields .= '">';
+						if(isset($field['error']) && $field['error']===true) {
+							$form_fields .= '<div class="errMsg">This field cannot be left blank.</div>';
+						}
+						$form_fields .= '
+								<label for="'.$field['slug'].'">'.$field['label'];
+						if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+						$form_fields .= '</label>
+						<select name="'.$field['slug'].'" id="'.$field['slug'].'">'."\r\n";
+							foreach($field['options'] as $key => $val) {
+								$form_fields .= '<option value="'.$key.'">'.$val.'</option>'."\r\n";
+							}
+							$form_fields .= '
 						</select>
 					</div>
 					';
 					break;
 				case 'multiselect':
 					$form_fields .= '
-					<div class="multiselect">
-						<label for="'.$field['slug'].'">'.$field['label'].'</label>
-						<select multiple name="'.$field['slug'].'" id="'.$field['slug'].'">'."\r\n";
-						foreach($field['options'] as $key => $val) {
-							$form_fields .= '<option value="'.$key.'">'.$val.'</option>'."\r\n";
+					<div class="multiselect	';
+						if(isset($field['error']) && $field['error']===true) {
+							$form_fields .= ' error';
 						}
-					$form_fields .= '
+						$form_fields .= '">';
+						if(isset($field['error']) && $field['error']===true) {
+							$form_fields .= '<div class="errMsg">This field cannot be left blank.</div>';
+						}
+						$form_fields .= '
+								<label for="'.$field['slug'].'">'.$field['label'];
+						if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+						$form_fields .= '</label>
+						<select multiple name="'.$field['slug'].'" id="'.$field['slug'].'">'."\r\n";
+							foreach($field['options'] as $key => $val) {
+								$form_fields .= '<option value="'.$key.'">'.$val.'</option>'."\r\n";
+							}
+							$form_fields .= '
 						</select>
 					</div>
 					';
@@ -232,23 +309,22 @@ function gen_uuid() {
 	);
 }
 
-function psc_save_attachment($info, $post_id) {
-	// make sure it's png, jpg, or gif
+function insert_attachment($file_handler, $post_id) {
+	// check to make sure its a successful upload
+	if ($_FILES[$file_handler]['error'] !== UPLOAD_ERR_OK) return false;
 	
-	$wp_filetype = wp_check_filetype(basename($filename), null );
-	$attachment = array(
-		'post_mime_type' => $wp_filetype['type'],
-		'post_title' => preg_replace('/\.[^.]+$/', '', basename($filename)),
-		'post_content' => '',
-		'post_status' => 'inherit'
-	);
-	$attach_id = wp_insert_attachment( $attachment, $filename, $post_id );
-	// you must first include the image.php file
-	// for the function wp_generate_attachment_metadata() to work
+	// check that it's a jpeg, gif, or png image
+	// if ($_FILES[$file_handler]['error'] !== UPLOAD_ERR_OK) return false;
+	
 	require_once(ABSPATH . "wp-admin" . '/includes/image.php');
+	require_once(ABSPATH . "wp-admin" . '/includes/file.php');
+	require_once(ABSPATH . "wp-admin" . '/includes/media.php');
+	
+	$attach_id = media_handle_upload( $file_handler, $post_id );
+	
 	$attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
 	wp_update_attachment_metadata( $attach_id,  $attach_data );
-	// modify the the $psc array's options
+	return true;
 }
 
 ?>
