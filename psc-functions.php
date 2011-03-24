@@ -22,10 +22,10 @@ function psc_head() {
 }
 
 
-function psc_save_cleanup($data) {
-	do_action('psc_data_alter', $data);
+// function psc_save_cleanup($data) {
+// 	do_action('psc_data_alter', $data);
 	// remove stuff that's going in the table in its own column
 	// clean up the data here
-}
+// }
 
 ?>

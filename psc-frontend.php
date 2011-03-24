@@ -12,13 +12,6 @@ function psc_show_form( $atts ){
 			'id' => 1,
 	), $atts ) );
 	
-	// $uri = explode('/', $_SERVER['REQUEST_URI']);
-	
-	// There's gotta be a better way of posting a form on the front-end.
-	// $new_uri = 'http://'.$_SERVER['SERVER_NAME'].'/'.$uri[1].'/wp-content/plugins/public-submission/public-submission.php';
-	
-	// $image_uri = 'http://'.$_SERVER['SERVER_NAME'].'/'.$uri[1].'/';
-	
 	// Get the Form from the DB
 	$res = $wpdb->get_results('SELECT * FROM '.$psc->forms.' WHERE id="'.$id.'"');
 	$fields = unserialize($res[0]->data);
@@ -33,45 +26,57 @@ function psc_show_form( $atts ){
 				if($field['required']=='yes' && (!isset($_POST[$field['slug']]) || empty($_POST[$field['slug']])) && $field['type']!='file') {
 					$fields[$key]['error'] = true;
 					$any_errors = true;
+				} else if($field['type'] == 'file') {
+						$attachment = array(
+							'field' => $field
+						);
 				} else if(isset($_POST[$field['slug']]) && !empty($_POST[$field['slug']])) {
 					// if maps_as content
 					if(isset($field['maps_as']) && $field['maps_as']=='content') {
 						// add to content var
 						$content = $_POST[$field['slug']];
-					} else if($field['type'] == 'file') {
-						$attachment = array(
-							'data' => $_POST[$field['slug']],
-							'field' => $field
-						);
 					} else {
 						// add to meta save array
 						$meta[$field['slug']] = $_POST[$field['slug']];
 					}
+				} else {
+					$meta[$field['slug']] = '';
 				}
 			}
 			if(!$any_errors) {
 				// save post
-				$post_id = psc_create_post($content='', $post_category=1, $status='pending', $post_type='post');
+				$post_id = psc_create_post($content, $res[0]->default_category, $res[0]->default_status); // $res[0]->default_post_type (v1.1?)
 				
 				if($post_id===false) {
 					$any_errors = true;
 				} else {
 					// save attachment
 					if(isset($attachment)) {
-						insert_attachment($attachment['field']['slug'], $post_id);
+						$image = insert_attachment($attachment['field']['slug'], $post_id);
+						if($image===false) {
+							wp_delete_post($post_id, true);
+							$any_errors = true;
+							foreach($fields as $key => $field) {
+								if($field['type']=='file') {
+									$fields[$key]['error'] = true;
+								}
+							}
+						}
 					}
 					
-					// save meta
-					foreach($meta as $key => $value) {
-						add_post_meta($post_id, $key, $value, true);
+					if($any_errors===false) {
+						// save meta
+						foreach($meta as $key => $value) {
+							add_post_meta($post_id, $key, $value, true);
+						}
+						
+						// clear $_POST
+						$_POST = array();
+						
+						// thanks page, else render the form again with errors
+						header('Location: '.get_bloginfo('siteurl').$res[0]->thanks_url);
+						exit();
 					}
-					
-					// clear $_POST
-					$_POST = array();
-					
-					// thanks page, else render the form again with errors
-					header('Location: http://wordpress.dev/thanks');
-					exit();
 				}
 			}
 		} else if(!empty($_POST) && !wp_verify_nonce($_POST['psc_add'], 'psc_nonce_field')) {
@@ -231,7 +236,7 @@ function psc_show_form( $atts ){
 		}
 		?>
 		<?php if($psc_error) { echo '<div id="psc_alert">Sorry, but your submission could not be saved.</div>'; } ?>
-		<form <?php if($file) { echo 'enctype="multipart/form-data" '; } ?>name="psc_user_news" class="psc_user_submission" id="psc_form_<?php echo $res[0]->slug ?>" action="<?php echo $form_uri ?>" method="post">
+		<form <?php if($file) { echo 'enctype="multipart/form-data" '; } ?>name="psc_user_news" class="psc_user_submission" id="psc_form_<?php echo $res[0]->slug ?>" action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
 			<?php
 			echo '<input type="hidden" name="psc_form_id" id="psc_form_id" value="'.$id.'" />';
 		
@@ -269,7 +274,7 @@ function psc_create_post($content='', $post_category=1, $status='pending', $post
 	
 	$post = array(
 		'post_author' => 1, // Admin //The user ID number of the author.
-		'post_category' => $post_category, // Get ID os publicly_submitted_content //Add some categories.
+		'post_category' => array($post_category), // Get ID os publicly_submitted_content //Add some categories.
 		'post_content' => $content, // if a field in the form maps_as 'content' //The full text of the post.
 		'post_name' => $hash, // The name (slug) for your post
 		'post_parent' => 0, //Sets the parent of the new post.
@@ -314,16 +319,17 @@ function insert_attachment($file_handler, $post_id) {
 	if ($_FILES[$file_handler]['error'] !== UPLOAD_ERR_OK) return false;
 	
 	// check that it's a jpeg, gif, or png image
-	// if ($_FILES[$file_handler]['error'] !== UPLOAD_ERR_OK) return false;
+	if(!in_array($_FILES[$file_handler]['type'], array('image/gif', 'image/jpeg', 'image/png'))) return false;
 	
 	require_once(ABSPATH . "wp-admin" . '/includes/image.php');
 	require_once(ABSPATH . "wp-admin" . '/includes/file.php');
 	require_once(ABSPATH . "wp-admin" . '/includes/media.php');
 	
 	$attach_id = media_handle_upload( $file_handler, $post_id );
-	
 	$attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
 	wp_update_attachment_metadata( $attach_id,  $attach_data );
+	update_post_meta($post_id,'_thumbnail_id',$attach_id);
+	
 	return true;
 }
 

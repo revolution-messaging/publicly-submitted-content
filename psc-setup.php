@@ -34,6 +34,7 @@ function psc_activate() {
 			id int unsigned auto_increment not null,
 			name varchar(30) not null,
 			slug varchar(30) not null,
+			thanks_url varchar(255) not null,
 			captcha tinyint(1) default 0,
 			data text,
 			default_category bigint(20) unsigned,
@@ -87,6 +88,19 @@ function psc_deactivate() {
  */
 function psc_uninstall() {
 	global $wpdb, $psc;
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	
+	if($wpdb->get_var('SHOW TABLES LIKE "'.$psc->forms.'"') == $psc->forms) {
+		dbDelta('DROP TABLE '.$psc->forms);
+		// default_template varchar(20) null,
+	}
+	
+	delete_option('psc_recaptch_key');
+	delete_option('psc_recaptch_auth');
+	delete_option('psc_plugin_version');
+	delete_option('psc_category_slug');
+	delete_option('psc_db_version');
+	
 	// publicly_submitted_content
 	// wp_delete_category($id);
 	return true;
