@@ -29,6 +29,6 @@ jQuery(document).ready(function() {
 	
 	jQuery('a.deleteFieldItem').attr('href', 'javascript:void(0);');
 	jQuery('a.deleteFieldItem').click(function() {
-		jQuery(this).parent().slideUp(400).delay(1000).detach();
+		jQuery(this).parent().slideUp(400, function() { jQuery(this).remove(); });
 	});
 });
