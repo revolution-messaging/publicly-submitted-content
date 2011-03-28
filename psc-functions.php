@@ -10,7 +10,7 @@
 function psc_get_story($id) {
 	global $wpdb, $psc;
 	$query = 'SELECT * FROM '.$psc->data.' WHERE id = '.$id;
-
+	
 	return $wpdb->get_results($query);
 }
 

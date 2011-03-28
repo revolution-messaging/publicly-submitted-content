@@ -1,0 +1,137 @@
+#catpchaInfoForm {
+	margin: 0;
+	width: 350px;
+	background: #fff;
+	padding: 10px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#catpchaInfoForm .text label {
+	display: block;
+}
+
+#catpchaInfoForm .text input {
+	width: 300px;
+	margin: 0 0 10px 0;
+}
+
+#catpchaInfoForm .submit {
+	margin: 0;
+	padding: 0;
+}
+
+#form_edit_options {
+	margin: 0 0 20px 0;
+	float: left;
+	background: #fff;
+	padding: 10px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#form_edit_options .submit {
+	margin: 10px 0 10px 0;
+	padding: 0;
+}
+
+#form_edit_options #psc_catcha_info {
+	width: 250px;
+	color: red;
+}
+
+#form_edit_options .select, #form_edit_options .checkbox, #form_edit_options .text {
+	margin: 10px 0;
+	width: 370px;
+}
+
+#form_edit_options label {
+	display: block;
+}
+
+#form_edit_options .checkbox label {
+	display: inline;
+	padding: 0 0 0 5px;
+}
+
+#form_edit_options label .small, #form_edit_fields label .small {
+	font-size: 10px;
+	display: block;
+}
+
+#form_edit_options .select select {
+	width: 250px;
+}
+
+#form_edit_fields {
+	margin: 0 0 0 410px;
+	list-style: none;
+}
+
+#form_edit_fields .fieldItem {
+	background: #fff;
+	padding: 10px;
+	margin: 0 0 20px 0;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#form_edit_fields .checkbox, #form_edit_fields .select, #form_edit_fields .text {
+	margin: 10px 0 10px 0;
+	background: transparent;
+}
+
+#form_edit_fields .checkbox {
+	margin: 10px 0 10px 125px;
+}
+
+#form_edit_fields .select label, #form_edit_fields .text label {
+	display: block;
+	float: left;
+	text-align: right;
+	width: 90px;
+}
+
+#form_edit_fields .select select, #form_edit_fields .text input {
+	margin: 0 0 0 35px;
+	width: 300px;
+}
+
+#form_edit_fields .options input {
+	margin: 0;
+}
+
+#form_edit_fields .options label {
+	float: none;
+	text-align: left;
+	width: 430px;
+}
+
+#form_edit_fields .checkbox label {
+	display: inline;
+	padding: 0 0 0 5px;
+}
+
+#psc_form_add_field {
+	margin: 0 0 20px 410px;
+}
+
+#psc_form_add_field a {
+	display: block;
+	color: #fff;
+	padding: 10px 20px;
+	background: darkred;
+	text-decoration: none;
+	width: 95px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#psc_form_add_field a:hover {
+	background: black;
+	color: #ccc;
+}

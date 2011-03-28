@@ -15,7 +15,7 @@ function psc_activate() {
 	// $installed_ver = get_option( "psc_db_version" );
 	// 
 	// if( $installed_ver != $psc->database_version ) {
-	// 	
+	// 	// do DB updates here
 	// 	update_option("psc_db_version", $psc->database_version );
 	// }
 	
@@ -58,8 +58,8 @@ function psc_activate() {
 	);
 	
 	wp_insert_category($cat_array);
-	add_option('psc_recaptch_key', '', '', 'yes');
-	add_option('psc_recaptch_auth', '', '', 'yes');
+	add_option('psc_recaptch_public_key', '', '', 'yes');
+	add_option('psc_recaptch_private_key', '', '', 'yes');
 	add_option('psc_plugin_version', $psc->version, '', 'no');
 	add_option('psc_category_slug', $psc->category_slug, '', 'no');
 	add_option('psc_db_version', $psc->database_version, '', 'no');

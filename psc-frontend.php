@@ -4,7 +4,7 @@
  * Shows form used to submit story
  */
 function psc_show_form( $atts ){
-	global $wpdb, $psc;
+	global $wpdb, $psc, $recaptcha_error;
 	
 	$psc_error = false;
 	
@@ -15,6 +15,18 @@ function psc_show_form( $atts ){
 	// Get the Form from the DB
 	$res = $wpdb->get_results('SELECT * FROM '.$psc->forms.' WHERE id="'.$id.'"');
 	$fields = unserialize($res[0]->data);
+	
+	$resp = (object) array('is_valid' => true);
+	
+	if($res[0]->captcha===1) {
+		require_once(dirname(__FILE__).'/recaptcha/recaptchalib.php');
+		$GLOBALS['recaptcha_error'] = null;
+		$GLOBALS['recaptcha_resp'] = null;
+		$resp = recaptcha_check_answer(get_option('psc_recaptch_private_key'),
+										$_SERVER["REMOTE_ADDR"],
+										$_POST["recaptcha_challenge_field"],
+										$_POST["recaptcha_response_field"]);
+	}
 	
 	if(count($res) == 1) {
 		$any_errors = false;
@@ -43,6 +55,12 @@ function psc_show_form( $atts ){
 					$meta[$field['slug']] = '';
 				}
 			}
+			
+			if(!$resp->is_valid) {
+				$any_errors = true;
+				$recaptcha_error = $resp->error;
+			}
+			
 			if(!$any_errors) {
 				// save post
 				$post_id = psc_create_post($content, $res[0]->default_category, $res[0]->default_status); // $res[0]->default_post_type (v1.1?)
@@ -73,13 +91,19 @@ function psc_show_form( $atts ){
 						// clear $_POST
 						$_POST = array();
 						
-						// thanks page, else render the form again with errors
-						header('Location: '.get_bloginfo('siteurl').$res[0]->thanks_url);
-						exit();
+						if(!empty($res[0]->thanks_url)) {
+							// thanks page, else render the form again with errors
+							header('Location: '.get_bloginfo('siteurl').$res[0]->thanks_url);
+							exit();
+						} else {
+							echo '<div id="submissionThankYou">Thanks!</div>';
+						}
 					}
 				}
 			}
 		} else if(!empty($_POST) && !wp_verify_nonce($_POST['psc_add'], 'psc_nonce_field')) {
+			$psc_error = true;
+		} else if(!empty($_POST) && !$resp->is_valid) {
 			$psc_error = true;
 		} else if(!empty($_POST) && $_POST['psc_form_id']!=$id) {
 			$psc_error = true;
@@ -247,6 +271,9 @@ function psc_show_form( $atts ){
 			echo $form_fields;
 			
 			// Captcha ?
+			if($res[0]->captcha===1) {
+				echo recaptcha_get_html(get_option('psc_recaptch_public_key'), $recaptcha_error);
+			}
 			?>
 			<div class="submit">
 				<input type="submit" value="Submit" />
@@ -331,6 +358,17 @@ function insert_attachment($file_handler, $post_id) {
 	update_post_meta($post_id,'_thumbnail_id',$attach_id);
 	
 	return true;
+}
+
+function psc_show_value($string) {
+	// figure out if we're in the loop
+	 
+	// get the psc_form_id
+	// get the form
+	foreach($fields as $field) {
+		// if it maps to content, return content raw (no HTML)
+		// otherwise, output custom field
+	}
 }
 
 ?>
