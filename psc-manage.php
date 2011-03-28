@@ -4,7 +4,7 @@
 // wp_register_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js');
 wp_enqueue_script('jquery');
 wp_enqueue_script('psc_admin', plugins_url('/psc_js.js', __FILE__));
-// wp_register_style('psc_admin', plugins_url('/psc_admin.css', __FILE__));
+wp_enqueue_style('psc_admin', plugins_url('/psc_admin.css', __FILE__));
 
 /*
  * Manage the PSC Forms
@@ -211,7 +211,6 @@ function psc_edit_form($form_id=null) {
 		}
 		// Edit the form!!
 		echo '
-		<link rel="stylesheet" type="text/css" href="'.plugins_url('/psc_admin.css', __FILE__).'" />
 		<div class="wrap">
 			<div id="icon-edit" class="icon32 icon32-posts-post"><br /></div>
 			<h2>Edit Form</h2>
@@ -328,7 +327,7 @@ function psc_edit_form($form_id=null) {
 }
 
 function psc_admin_index_header() {
-	return '<link rel="stylesheet" type="text/css" href="'.plugins_url('/psc_admin.css', __FILE__).'" /><div class="wrap"><div id="icon-edit" class="icon32 icon32-posts-post"><br /></div> 
+	return '<div class="wrap"><div id="icon-edit" class="icon32 icon32-posts-post"><br /></div> 
 	<h2>Forms <a href="?action=new_form" class="button add-new-h2">Add New</a></h2>
 	<table class="wp-list-table widefat fixed posts" cellspacing="0">
 		<thead>
