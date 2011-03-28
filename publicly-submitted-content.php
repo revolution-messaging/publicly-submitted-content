@@ -13,7 +13,8 @@ $GLOBALS['psc'] = (object) array(
 	'forms' => $GLOBALS['wpdb']->prefix . 'psc_forms',
 	'database_version' => '1.0',
 	'category_slug' => 'publicly_submitted_content',
-	'version' => '1.0');
+	'version' => '1.0'
+);
 
 /* My Logging Function */
 function logit($var, $export=true) {

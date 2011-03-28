@@ -288,6 +288,7 @@ function psc_edit_form($form_id=null) {
 							';
 						foreach($fields as $key => $field) {
 							echo '<li id="field'.$key.'item" class="fieldItem">
+							<a href="#" class="deleteFieldItem">[delete]</a>
 							<div class="text"><label for="field'.$key.'label">Label</label><input type="text" name="data['.$key.'][label]" id="field'.$key.'label" value="'.$field['label'].'" /></div>';
 							echo '<div class="text"><label for="field'.$key.'slug">Slug/ID/Name</label><input type="text" name="data['.$key.'][slug]" id="field'.$key.'slug" value="'.str_replace('psc_', '', $field['slug']).'" /></div>';
 							echo '<div class="select"><label for="field'.$key.'type">Type</label><select name="data['.$key.'][type]" id="field'.$key.'type">';

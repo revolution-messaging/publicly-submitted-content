@@ -22,6 +22,10 @@
 	padding: 0;
 }
 
+a.deleteFieldItem {
+	float: right;
+}
+
 #form_edit_options {
 	margin: 0 0 20px 0;
 	float: left;
