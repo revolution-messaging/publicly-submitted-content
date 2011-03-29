@@ -22,9 +22,9 @@ jQuery(document).ready(function() {
 	jQuery('#psc_form_add_field a').attr('href', 'javascript:void(0);');
 	jQuery('#psc_form_add_field a').click(function() {
 		var count_items = 0;
-		count_items = jQuery('.fieldItem').length;
-		console.log(count_items);
+		count_items = jQuery('#psckeycount').attr('value').valueOf();
 		jQuery('ol#form_edit_fields').append('<li id="field'+count_items+'item" class="fieldItem"><a href="#" class="deleteFieldItem">[delete]</a><div class="text"><label for="field'+count_items+'label">Label</label><input type="text" name="data['+count_items+'][label]" id="field'+count_items+'label" value="" /></div><div class="text"><label for="field'+count_items+'slug">Slug/ID/Name</label><input type="text" name="data['+count_items+'][slug]" id="field'+count_items+'slug" value="" /></div><div class="select"><label for="field'+count_items+'type">Type</label><select name="data['+count_items+'][type]" id="field'+count_items+'type"><option value="text" selected="selected">Text</option><option value="textarea">Textarea</option><option value="hidden">Hidden</option><option value="select">Select</option><option value="multiselect">Multiselect</option><option value="radio">Radio</option><option value="checkbox">Checkbox</option></select></div><div class="text options" style="display:none;"><label for="field'+count_items+'options">Options <span class="small">(comma separated list of options for select, multiselect, checkbox, and radio types)</span></label><input type="text" name="data['+count_items+'][options]" id="field'+count_items+'options" value="" /></div><div class="checkbox"><input type="checkbox" name="data['+count_items+'][required]" id="field'+count_items+'required" /><label for="field'+count_items+'required">Required</label></div><div class="checkbox"><input type="checkbox" name="data['+count_items+'][maps_as]" id="field'+count_items+'maps_as" /><label for="field'+count_items+'maps_as">Use this as the "post content"</label></div></li>');
+		jQuery('#psckeycount').attr('value', count_items++);
 	});
 	
 	jQuery('a.deleteFieldItem').attr('href', 'javascript:void(0);');

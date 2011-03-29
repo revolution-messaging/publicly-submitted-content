@@ -43,6 +43,8 @@ function psc_activate() {
 		// default_template varchar(20) null,
 	}
 	
+	$wpdb->query("INSERT INTO `".$psc_forms."` VALUES (1,'Story Tellin\'','story_tellin','',0,'a:8:{i:0;a:4:{s:5:\"label\";s:4:\"Name\";s:4:\"slug\";s:8:\"psc_name\";s:4:\"type\";s:4:\"text\";s:8:\"required\";s:4:\"true\";}i:1;a:4:{s:5:\"label\";s:13:\"Email Address\";s:4:\"slug\";s:17:\"psc_email_address\";s:4:\"type\";s:4:\"text\";s:8:\"required\";s:4:\"true\";}i:2;a:4:{s:5:\"label\";s:13:\"Mobile Number\";s:4:\"slug\";s:10:\"psc_mobile\";s:4:\"type\";s:4:\"text\";s:8:\"required\";s:4:\"true\";}i:3;a:5:{s:5:\"label\";s:5:\"Story\";s:4:\"slug\";s:9:\"psc_story\";s:7:\"maps_as\";s:7:\"content\";s:4:\"type\";s:8:\"textarea\";s:8:\"required\";s:4:\"true\";}i:4;a:4:{s:5:\"label\";s:8:\"Location\";s:4:\"slug\";s:12:\"psc_location\";s:4:\"type\";s:4:\"text\";s:8:\"required\";s:4:\"true\";}i:5;a:4:{s:5:\"label\";s:8:\"Latitude\";s:4:\"slug\";s:12:\"psc_latitude\";s:4:\"type\";s:6:\"hidden\";s:8:\"required\";s:5:\"false\";}i:6;a:4:{s:5:\"label\";s:9:\"Longitude\";s:4:\"slug\";s:13:\"psc_longitude\";s:4:\"type\";s:6:\"hidden\";s:8:\"required\";s:4:\"true\";}i:7;a:4:{s:5:\"label\";s:7:\"Picture\";s:4:\"slug\";s:11:\"psc_picture\";s:4:\"type\";s:4:\"file\";s:8:\"required\";s:5:\"false\";}}',3,'pending');");
+	
 	/* check with array_key_exists and then make "fields" a serialized array with lots of subsettings:
 	 * 		label
 	 * 		id/name <-- same diff

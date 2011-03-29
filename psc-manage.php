@@ -130,7 +130,11 @@ function psc_admin_index() {
 function psc_save_form($data) {
 	global $wpdb, $psc;
 	
-	$fields = $data['data'];
+	$old_fields = $data['data'];
+	$fields = array();
+	foreach($old_fields as $field) {
+		$fields[] = $field;
+	}
 	
 	foreach($fields as $key => $value) {
 		if(empty($value['options']) || !in_array($value['type'], array('select', 'multiselect', 'radio', 'checkbox'))) {
@@ -318,7 +322,7 @@ function psc_edit_form($form_id=null) {
 							echo ' name="data['.$key.'][maps_as]" id="field'.$key.'maps_as" /><label for="field'.$key.'maps_as">Use this as the "post content"</label></div></li>';
 						}
 						echo '
-						</ol>
+						</ol><input type="hidden" id="psckeycount" value="'.($key+1).'" />
 						<div id="psc_form_add_field"><a href="#">Add form field</a></div>
 					</div>
 				</div>
