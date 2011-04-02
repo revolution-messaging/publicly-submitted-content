@@ -9,11 +9,19 @@ function psc_show_form( $atts ){
 	$psc_error = false;
 	
 	extract( shortcode_atts( array(
-			'id' => 1,
+			'id' => null,
+			'slug' => null
 	), $atts ) );
 	
 	// Get the Form from the DB
-	$res = $wpdb->get_results('SELECT * FROM '.$psc->forms.' WHERE id="'.$id.'"');
+	if($id) {
+		$res = $wpdb->get_results('SELECT * FROM '.$psc->forms.' WHERE id="'.$id.'"');
+	} else if($slug) {
+		$res = $wpdb->get_results('SELECT * FROM '.$psc->forms.' WHERE slug="'.mysql_escape_string($slug).'" LIMIT 0, 1');
+	} else {
+		echo '<p style="background:pink;border:1px solid red;color:red;padding:5px 10px;">Error, you must provide a slug or id to "psc_show_forms".</p>';
+	}
+	
 	$fields = unserialize($res[0]->data);
 	
 	$resp = (object) array('is_valid' => true);
@@ -35,7 +43,7 @@ function psc_show_form( $atts ){
 			$content = '';
 			$meta = array();
 			foreach($fields as $key => $field) {
-				if($field['required']=='yes' && (!isset($_POST[$field['slug']]) || empty($_POST[$field['slug']])) && $field['type']!='file') {
+				if($field['required']=='true' && (!isset($_POST[$field['slug']]) || empty($_POST[$field['slug']])) && $field['type']!='file') {
 					$fields[$key]['error'] = true;
 					$any_errors = true;
 				} else if($field['type'] == 'file') {
@@ -112,6 +120,7 @@ function psc_show_form( $atts ){
 		$file = false;
 		$form_fields = '';
 		// Loop through and generate the elements
+		
 		foreach($fields as $field) {
 			switch($field['type']) {
 				case 'text':
@@ -126,9 +135,13 @@ function psc_show_form( $atts ){
 					}
 					$form_fields .= '
 							<label for="'.$field['slug'].'">'.$field['label'];
-					if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+					if($field['required']=='true') { $form_fields .= ' <span class="required">*</span>'; }
 					$form_fields .= '</label>
-							<input type="text" name="'.$field['slug'].'" id="'.$field['slug'].'" />
+							<input type="text" name="'.$field['slug'].'" id="'.$field['slug'].'" value="';
+					if(isset($_POST[$field['slug']])) {
+						$form_fields .= $_POST[$field['slug']];
+					}
+					$form_fields .= '" />
 						</div>
 					';
 					break;
@@ -145,14 +158,20 @@ function psc_show_form( $atts ){
 						}
 						$form_fields .= '
 								<label for="'.$field['slug'].'">'.$field['label'];
-						if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+						if($field['required']=='true') { $form_fields .= ' <span class="required">*</span>'; }
 						$form_fields .= '</label>
 							<input type="file" name="'.$field['slug'].'" id="'.$field['slug'].'" />
 						</div>
 					';
 					break;
 				case 'hidden':
-					$form_fields .= '<input type="hidden" name="'.$field['slug'].'" id="'.$field['slug'].'" value="'.$field['value'].'" />';
+					$form_fields .= '<input type="hidden" name="'.$field['slug'].'" id="'.$field['slug'].'" value="';
+					if(isset($_POST[$field['slug']])) {
+						$form_fields .= $_POST[$field['slug']];
+					} else if(isset($field['value'])) {
+						$form_fields .= $field['value'];
+					}
+					$form_fields .= '" />';
 					break;
 				case 'password':
 					$form_fields .= '
@@ -166,9 +185,13 @@ function psc_show_form( $atts ){
 						}
 						$form_fields .= '
 								<label for="'.$field['slug'].'">'.$field['label'];
-						if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+						if($field['required']=='true') { $form_fields .= ' <span class="required">*</span>'; }
 						$form_fields .= '</label>
-					<input type="password" name="'.$field['slug'].'" id="'.$field['slug'].'" />
+					<input type="password" name="'.$field['slug'].'" id="'.$field['slug'].'" value="';
+					if(isset($_POST[$field['slug']])) {
+						$form_fields .= $_POST[$field['slug']];
+					}
+					$form_fields .= '"/>
 					</div>
 					';
 					break;
@@ -184,31 +207,58 @@ function psc_show_form( $atts ){
 					}
 					$form_fields .= '
 							<label for="'.$field['slug'].'">'.$field['label'];
-					if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+					if($field['required']=='true') { $form_fields .= ' <span class="required">*</span>'; }
 					$form_fields .= '</label>
-					<textarea name="'.$field['slug'].'" id="'.$field['slug'].'"></textarea>
+					<textarea name="'.$field['slug'].'" id="'.$field['slug'].'">';
+					if(isset($_POST[$field['slug']])) {
+						$form_fields .= $_POST[$field['slug']];
+					}
+					$form_fields .= '</textarea>
 					</div>
 					';
 					break;
+				case 'checkbox':
+					if(isset($field['options']) && !empty($field['options'])) {
+						$form_fields .= '<fieldset id="psc_'.$field['slug'].'" class="checkboxgroup';
+						if(isset($field['error']) && $field['error']===true) {
+							$form_fields .= ' error">
+							<div class="errMsg">You must check at least one.</div>';
+						} else {
+							$form_fields .= '">';
+						}
+						$form_fields .= '<legend>'.$field['label'];
+						if($field['required']=='true') $form_fields .= '<span class="required">*</span>';
+						$form_fields .= '</legend>';
+						$i = 0;
+						foreach($field['options'] as $val) {
+							$i++;
+							$form_fields .= '<div class="checkboxoption"><input type="checkbox" value="'.$val.'" name="'.$field['slug'].'['.$i.']['.$val.']" id="option_'.$i.'_'.$field['slug'].'" class="'.$field['slug'].'" /> <label for="option_'.$i.'_'.$field['slug'].'">'.$val.'</label></div>'."\r\n";
+						}
+						$form_fields .= '</fieldset>';
+					} else {
+						$form_fields .= '<div id="psc_'.$field['slug'].'" class="checkbox">';
+						$form_fields .= '<div class="checkboxoption"><input type="checkbox" name="'.$field['slug'].'" id="'.$field['slug'].'" class="'.$field['slug'].'" /> <label for="'.$field['slug'].'">'.$field['label'].'</label></div>'."\r\n";
+						$form_fields .= '</div>';
+					}
+					break;
 				case 'radio':
 					$form_fields .= '
-					<div id="psc_'.$field['slug'].'" class="radiogroup';
+					<fieldset id="psc_'.$field['slug'].'" class="radiogroup';
 					if(isset($field['error']) && $field['error']===true) {
 						$form_fields .= ' error';
 					}
-					$form_fields .= '">';
+					$form_fields .= '"><legend>'.$field['label'];
+					if($field['required']=='true') { $form_fields .= '<span class="required">*</span>'; }
+					$form_fields .= '</legend>';
 					if(isset($field['error']) && $field['error']===true) {
 						$form_fields .= '<div class="errMsg">You must select an option.</div>';
 					}
-						$i = 0;
-						foreach($field['options'] as $key => $val) {
-							$i++;
-							$form_fields .= '<div class="radio"><input type="radio" name="'.$field['slug'].'" id="'.$i.'_'.$field['slug'].'" class="'.$field['slug'].'"> <label for="'.$i.'_'.$field['slug'].'">'.$field['label'].'</label></div>'."\r\n";
-						}
-					if($field['required']=='yes') { $form_fields .= '<div class="required">require</div>'; }
-					$form_fields .= '
-					</div>
-					';
+					$i = 0;
+					foreach($field['options'] as $val) {
+						$i++;
+						$form_fields .= '<div class="radio"><input type="radio" value="'.$val.'" name="'.$field['slug'].'" id="'.$i.'_'.$field['slug'].'" class="'.$field['slug'].'"> <label for="'.$i.'_'.$field['slug'].'">'.$val.'</label></div>'."\r\n";
+					}
+					$form_fields .= '</fieldset>';
 					break;
 				case 'select':
 					$form_fields .= '
@@ -218,13 +268,15 @@ function psc_show_form( $atts ){
 						}
 						$form_fields .= '">';
 						if(isset($field['error']) && $field['error']===true) {
-							$form_fields .= '<div class="errMsg">This field cannot be left blank.</div>';
+							$form_fields .= '<div class="errMsg">You must select an option.</div>';
 						}
 						$form_fields .= '
 								<label for="'.$field['slug'].'">'.$field['label'];
-						if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+						if($field['required']=='true') { $form_fields .= ' <span class="required">*</span>'; }
 						$form_fields .= '</label>
-						<select name="'.$field['slug'].'" id="'.$field['slug'].'">'."\r\n";
+						<select name="'.$field['slug'].'" id="'.$field['slug'].'">'."\r\n".'
+							<option>Select an option...</option>
+						';
 							foreach($field['options'] as $key => $val) {
 								$form_fields .= '<option value="'.$key.'">'.$val.'</option>'."\r\n";
 							}
@@ -245,7 +297,7 @@ function psc_show_form( $atts ){
 						}
 						$form_fields .= '
 								<label for="'.$field['slug'].'">'.$field['label'];
-						if($field['required']=='yes') { $form_fields .= ' <span class="required">*</span>'; }
+						if($field['required']=='true') { $form_fields .= ' <span class="required">*</span>'; }
 						$form_fields .= '</label>
 						<select multiple name="'.$field['slug'].'" id="'.$field['slug'].'">'."\r\n";
 							foreach($field['options'] as $key => $val) {
@@ -271,7 +323,8 @@ function psc_show_form( $atts ){
 			echo $form_fields;
 			
 			// Captcha ?
-			if($res[0]->captcha===1) {
+			if($res[0]->captcha==="1") {
+				require_once(dirname(__FILE__).'/recaptcha/recaptchalib.php');
 				echo recaptcha_get_html(get_option('psc_recaptch_public_key'), $recaptcha_error);
 			}
 			?>
@@ -281,7 +334,10 @@ function psc_show_form( $atts ){
 		</form>
 		<?php
 	} else if(count($res)==0) {
-		echo 'Sorry, but there isn\'t a form with that ID.';
+		echo 'Sorry, but we couldn\'t find a form with ';
+		if($slug) { echo 'slug: '.$slug; }
+		else if($id) { echo 'id: '.$id; }
+		echo '.';
 	} else {
 		echo 'Sorry, but we got more than 1 form back.';
 	}

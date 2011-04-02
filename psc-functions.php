@@ -18,14 +18,7 @@ function psc_get_story($id) {
  * Includes the javascript  (let's not actually make this JS, right now)
  */
 function psc_head() {
-	// echo '<script type="text/javascript" src="'.get_option('siteurl').'/wp-content/plugins/community-submitted-news/psc_js.js"></script>';
+	// echo '<script type="text/javascript" src="'.get_option('siteurl').'/wp-content/plugins/community-submitted-news/psc_frontend.js"></script>';
 }
-
-
-// function psc_save_cleanup($data) {
-// 	do_action('psc_data_alter', $data);
-	// remove stuff that's going in the table in its own column
-	// clean up the data here
-// }
 
 ?>

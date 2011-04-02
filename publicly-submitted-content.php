@@ -1,15 +1,28 @@
 <?php
 /*
 	Plugin Name: Publicly Submitted Content
-	Plugin URI: http://code.walkerhamilton.com/publicly_submitted_content
+	Plugin URI: http://code.appares.com/publicly_submitted_content
 	Description: Allows public submission and admin/editor moderation of information/posts
 	Version: 1.0
-	Author: Walker Hamilton
-	Author URI: http://walkerhamilton.com
+	Author: Appares
+	Author URI: http://appares.com
 
-	Copyright 2011 Revolution Messaging LLC (email: info@revolutionmessaging.com)
-*/
-$GLOBALS['psc'] = (object) array(
+	Copyright 2011 Appares LLC (email: support@appares.com)
+	
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License, version 2, as 
+	published by the Free Software Foundation.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+	*/
+	$GLOBALS['psc'] = (object) array(
 	'forms' => $GLOBALS['wpdb']->prefix . 'psc_forms',
 	'database_version' => '1.0',
 	'category_slug' => 'publicly_submitted_content',

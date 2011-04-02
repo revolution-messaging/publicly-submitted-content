@@ -22,18 +22,41 @@
 	padding: 0;
 }
 
-a.deleteFieldItem {
+#delete-action a, a.deleteFieldItem {
 	float: right;
+	font-size: 11px;
+	text-decoration: none;
+	border-bottom: 1px solid #f00;
+	color: #f00;
+	padding: 1px 2px;
+}
+
+#delete-action a {
+	line-height: 14px;
+	position: relative;
+	top: 3px;
+	margin: 0 0 0 5px;
+}
+
+#delete-action a:hover, a.deleteFieldItem:hover {
+	/*border-bottom: 1px solid #f00;*/
+	background: #f00;
+	color: #fff;
 }
 
 #form_edit_options {
+	width: 390px;
 	margin: 0 0 20px 0;
 	float: left;
 	background: #fff;
+}
+
+#form_edit_options h3.hndle {
+	cursor: default;
+}
+
+#form_edit_options .inside {
 	padding: 10px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
 }
 
 #form_edit_options .submit {
@@ -53,6 +76,7 @@ a.deleteFieldItem {
 
 #form_edit_options label {
 	display: block;
+	margin: 0 0 5px 0;
 }
 
 #form_edit_options .checkbox label {
@@ -60,7 +84,7 @@ a.deleteFieldItem {
 	padding: 0 0 0 5px;
 }
 
-#form_edit_options label .small, #form_edit_fields label .small {
+#form_edit_options label .small, .fieldItems label .small {
 	font-size: 10px;
 	display: block;
 }
@@ -69,73 +93,66 @@ a.deleteFieldItem {
 	width: 250px;
 }
 
-#form_edit_fields {
+.fieldItems {
 	margin: 0 0 0 410px;
 	list-style: none;
 }
 
-#form_edit_fields .fieldItem {
+#form_edit_options h3.hndle, .fieldItems .fieldItem h3.hndle {
+	font-size: 12px;
+	font-weight: bold;
+	padding: 7px 9px;
+	line-height: 1;
+	margin: 0;
+}
+
+.fieldItems .fieldItem .inside {
+	padding: 10px 20px;
+	display: none;
+}
+
+/*.fieldItems .fieldItem {
 	background: #fff;
 	padding: 10px;
 	margin: 0 0 20px 0;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-}
+}*/
 
-#form_edit_fields .checkbox, #form_edit_fields .select, #form_edit_fields .text {
+.fieldItems .checkbox, .fieldItems .select, .fieldItems .text {
 	margin: 10px 0 10px 0;
 	background: transparent;
 }
 
-#form_edit_fields .checkbox {
+.fieldItems .checkbox {
 	margin: 10px 0 10px 125px;
 }
 
-#form_edit_fields .select label, #form_edit_fields .text label {
+.fieldItems .select label, .fieldItems .text label {
 	display: block;
 	float: left;
 	text-align: right;
 	width: 90px;
+	position: relative;
+	top: 3px;
 }
 
-#form_edit_fields .select select, #form_edit_fields .text input {
-	margin: 0 0 0 35px;
+.fieldItems .select select, .fieldItems .text input {
+	margin: 0 0 0 15px;
 	width: 300px;
 }
 
-#form_edit_fields .options input {
-	margin: 0;
+.fieldItems .options p.small {
+	font-size: 10px;
+	margin: 0 0 20px 105px;
 }
 
-#form_edit_fields .options label {
-	float: none;
-	text-align: left;
-	width: 430px;
-}
-
-#form_edit_fields .checkbox label {
+.fieldItems .checkbox label {
 	display: inline;
 	padding: 0 0 0 5px;
 }
 
-#psc_form_add_field {
+#form_edit_options .preview.button {
 	margin: 0 0 20px 410px;
-}
-
-#psc_form_add_field a {
-	display: block;
-	color: #fff;
-	padding: 10px 20px;
-	background: darkred;
-	text-decoration: none;
-	width: 95px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
-}
-
-#psc_form_add_field a:hover {
-	background: black;
-	color: #ccc;
 }
