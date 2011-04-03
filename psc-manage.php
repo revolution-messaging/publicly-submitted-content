@@ -1,6 +1,10 @@
 <?php
 
 wp_enqueue_script('jquery');
+wp_enqueue_script('jquery-ui-core', dirname(dirname(dirname(dirname(__FILE__)))).'/wp-includes/js/jquery/ui.core.js');
+wp_enqueue_script('jquery-ui-widget', dirname(dirname(dirname(dirname(__FILE__)))).'/wp-includes/js/jquery/ui.widget.js');
+wp_enqueue_script('jquery-ui-mouse', dirname(dirname(dirname(dirname(__FILE__)))).'/wp-includes/js/jquery/ui.mouse.js');
+wp_enqueue_script('jquery-ui-sortable', dirname(dirname(dirname(dirname(__FILE__)))).'/wp-includes/js/jquery/ui.sortable.js');
 wp_enqueue_script('psc_admin', plugins_url('/psc_js.js', __FILE__));
 wp_enqueue_style('psc_admin', plugins_url('/psc_admin.css', __FILE__));
 

@@ -9,9 +9,11 @@ function slugify(text) {
 	return text;
 }
 
+function sortIt() {
+	jQuery('#normal-sortables').sortable();
+}
+
 jQuery(document).ready(function() {
-	console.log(jQuery('#api_key').attr('value'));
-	console.log(jQuery('#private_key').attr('value'));
 	jQuery('#captcha_option').change(function() {
 		if(jQuery('#captcha_option').attr('checked')==true) {
 			if(jQuery('#api_key').attr('value')=='' || jQuery('#private_key').attr('value')=='') {
@@ -21,6 +23,8 @@ jQuery(document).ready(function() {
 			jQuery('#psc_catcha_info').hide();
 		}
 	});
+	
+	sortIt();
 	
 	jQuery('.handlediv').live('click', function() {
 		if(jQuery(this).parent().children('.inside').css('display')=='block') {
@@ -67,6 +71,7 @@ jQuery(document).ready(function() {
 		var count_items = 0;
 		count_items = jQuery('#psckeycount').attr('value').valueOf();
 		jQuery('#normal-sortables').append('<div id="field'+count_items+'item" class="postbox fieldItem"><div class="handlediv" title="Click to toggle"><br></div><h3 class="hndle"><span>[Label]</span></h3><div class="inside" style="display:block;"><a href="#" class="deleteFieldItem">Delete Field</a><div class="text"><label for="field'+count_items+'label">Label</label><input type="text" name="data['+count_items+'][label]" class="fieldlabel" id="field'+count_items+'label" value="" /></div><div class="text"><label for="field'+count_items+'slug">Slug/ID/Name</label><input type="text" name="data['+count_items+'][slug]" class="slugify" id="field'+count_items+'slug" value="" /></div><div class="select"><label for="field'+count_items+'type">Type</label><select name="data['+count_items+'][type]" class="fieldtype" id="field'+count_items+'type"><option value="text" selected="selected">Text</option><option value="textarea">Textarea</option><option value="hidden">Hidden</option><option value="select">Select</option><option value="multiselect">Multiselect</option><option value="radio">Radio</option><option value="checkbox">Checkbox</option><option value="file">Image</option></select></div><div class="text options" style="display:none;"><label for="field'+count_items+'options">Options <span class="small">(comma separated list of options for select, multiselect, checkbox, and radio types)</span></label><input type="text" name="data['+count_items+'][options]" id="field'+count_items+'options" value="" /></div><div class="checkbox"><input type="checkbox" name="data['+count_items+'][required]" id="field'+count_items+'required" /><label for="field'+count_items+'required">Required</label></div><div class="checkbox"><input type="checkbox" name="data['+count_items+'][maps_as]" id="field'+count_items+'maps_as" /><label for="field'+count_items+'maps_as">Use this as the "post content"</label></div></div></div>');
+		sortIt();
 		jQuery('#psckeycount').attr('value', count_items++);
 	});
 	
