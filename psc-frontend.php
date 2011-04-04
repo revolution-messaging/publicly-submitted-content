@@ -46,10 +46,18 @@ function psc_show_form( $atts ){
 				if($field['required']=='true' && (!isset($_POST[$field['slug']]) || empty($_POST[$field['slug']])) && $field['type']!='file') {
 					$fields[$key]['error'] = true;
 					$any_errors = true;
-				} else if($field['type'] == 'file') {
+				} else if($field['type'] == 'file' && isset($_FILES[$field['slug']])) {
+					if($_FILES[$field['slug']]['error']==4 && $field['required']=='true') {
+						$fields[$key]['error'] = true;
+						$any_errors = true;
+					} else if($_FILES[$field['slug']]['error']!=0 && $field['required']=='true') {
+						$fields[$key]['error'] = true;
+						$any_errors = true;
+					} else if($_FILES[$field['slug']]['error']==0) {
 						$attachment = array(
 							'field' => $field
 						);
+					}
 				} else if(isset($_POST[$field['slug']]) && !empty($_POST[$field['slug']])) {
 					// if maps_as content
 					if(isset($field['maps_as']) && $field['maps_as']=='content') {
@@ -153,9 +161,12 @@ function psc_show_form( $atts ){
 							$form_fields .= ' error';
 						}
 						$form_fields .= '">';
-						if(isset($field['error']) && $field['error']===true) {
-							$form_fields .= '<div class="errMsg">This field cannot be left blank.</div>';
+						if(isset($field['error']) && $field['error']===true && $field['required']=='true') {
+							$form_fields .= '<div class="errMsg">You must provide a '.$field['label'].'.</div>';
+						} else if(isset($field['error']) && $field['error']===true) {
+							$form_fields .= '<div class="errMsg">There was a problem uploading your file.</div>';
 						}
+						
 						$form_fields .= '
 								<label for="'.$field['slug'].'">'.$field['label'];
 						if($field['required']=='true') { $form_fields .= ' <span class="required">*</span>'; }
