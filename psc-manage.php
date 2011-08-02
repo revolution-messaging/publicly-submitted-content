@@ -185,7 +185,6 @@ function psc_save_form($data) {
 		$data['thanks_url'] = null;
 	}
 	
-	// var_dump($data);
 	// echo '<br /><br />';
 	// var_dump('SET data=\''.mysql_escape_string(serialize($fields)).'\', name="'.mysql_escape_string($data['title']).'", slug="'.mysql_escape_string($data['slug']).'", thanks_url="'.mysql_escape_string($data['thanks_url']).'", default_status="'.mysql_escape_string($data['default_status']).'", default_category="'.mysql_escape_string($data['default_category']).'", captcha="'.mysql_escape_string($data['captcha']).'"');
 	
@@ -194,7 +193,6 @@ function psc_save_form($data) {
 		return true;
 	} else {
 		$insert_array = array('data' => serialize($fields), 'name' => $data['title'], 'slug' => $data['slug'], 'thanks_url' => $data['thanks_url'], 'default_status' => $data['default_status'], 'default_category' => $data['default_category'], 'captcha' => $data['catpcha']);
-		var_dump($insert_array);
 		$wpdb->insert($psc->forms, $insert_array);
 		return $wpdb->insert_id;
 	}
