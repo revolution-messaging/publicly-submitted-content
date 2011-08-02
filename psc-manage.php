@@ -74,8 +74,8 @@ function psc_admin_index() {
 		echo '<tr id="post-'.$form->id.'" class="alternate author-self status-publish format-default" valign="top">
 				<td class="post-title page-title column-title">
 					<strong>
-						<a class="row-title" href="'.get_bloginfo('siteurl').'/wp-admin/admin.php?page=publicly-submitted-content/admin&action=edit_form&id='.$form->id.'" title="Edit &#8220;'.str_replace("\"", "'", $form->name).'&#8221;">'.
-							$form->name.
+						<a class="row-title" href="'.get_bloginfo('siteurl').'/wp-admin/admin.php?page=publicly-submitted-content/admin&action=edit_form&id='.$form->id.'" title="Edit &#8220;'.stripslashes(str_replace("\"", "'", $form->name)).'&#8221;">'.
+							stripslashes($form->name).
 						'</a>
 					</strong>
 					<div class="row-actions">
