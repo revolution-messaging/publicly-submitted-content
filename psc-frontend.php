@@ -38,7 +38,7 @@ function psc_show_form( $atts, $form=true ){
 	
 	if(count($res) == 1) {
 		$any_errors = false;
-		if((!isset($_POST['psc_add']) && isset($_POST['wh_priv']) && $_POST['wh_priv']=='ftotheu') || (wp_verify_nonce($_POST['psc_add'], 'psc_nonce_field') && $_POST['psc_form_id']==$id))
+		if((!isset($_POST['psc_add']) && isset($_GET['psc_priv'])) || (wp_verify_nonce($_POST['psc_add'], 'psc_nonce_field') && $_POST['psc_form_id']==$id))
 		{
 			if(isset($_POST['wh_priv'])) unset($_POST['wh_priv']);
 			$content = '';
