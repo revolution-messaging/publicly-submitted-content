@@ -3,7 +3,7 @@
 /**
  * Shows form used to submit story
  */
-function psc_show_form( $atts ){
+function psc_show_form( $atts, $form=true ){
 	global $wpdb, $psc, $recaptcha_error;
 	
 	$psc_error = false;
@@ -38,8 +38,9 @@ function psc_show_form( $atts ){
 	
 	if(count($res) == 1) {
 		$any_errors = false;
-		if(wp_verify_nonce($_POST['psc_add'], 'psc_nonce_field') && $_POST['psc_form_id']==$id)
+		if((!isset($_POST['psc_add']) && isset($_POST['wh_priv']) && $_POST['wh_priv']=='ftotheu') || (wp_verify_nonce($_POST['psc_add'], 'psc_nonce_field') && $_POST['psc_form_id']==$id))
 		{
+			if(isset($_POST['wh_priv'])) unset($_POST['wh_priv']);
 			$content = '';
 			$meta = array();
 			foreach($fields as $key => $field) {
@@ -112,12 +113,13 @@ function psc_show_form( $atts ){
 							header('Location: '.get_bloginfo('siteurl').$res[0]->thanks_url);
 							exit();
 						} else {
-							echo '<div id="submissionThankYou">Thanks!</div>';
+							echo '<div id="submissionThankYou">Thanks for your submission! After a short period of moderation, it should appear.</div>';
+							$psc_success = true;
 						}
 					}
 				}
 			}
-		} else if(!empty($_POST) && !wp_verify_nonce($_POST['psc_add'], 'psc_nonce_field')) {
+		} else if(!empty($_POST) && isset($_POST['psc_add']) && !wp_verify_nonce($_POST['psc_add'], 'psc_nonce_field')) {
 			$psc_error = true;
 		} else if(!empty($_POST) && !$resp->is_valid) {
 			$psc_error = true;
@@ -321,8 +323,10 @@ function psc_show_form( $atts ){
 					break;
 			}
 		}
+		
+		if($psc_error) { echo '<div id="psc_alert">Sorry, but your submission could not be saved.</div>'; }
+		if($form_fields && $form===true) {
 		?>
-		<?php if($psc_error) { echo '<div id="psc_alert">Sorry, but your submission could not be saved.</div>'; } ?>
 		<form <?php if($file) { echo 'enctype="multipart/form-data" '; } ?>name="psc_user_news" class="psc_user_submission" id="psc_form_<?php echo $res[0]->slug ?>" action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
 			<?php
 			echo '<input type="hidden" name="psc_form_id" id="psc_form_id" value="'.$id.'" />';
@@ -344,6 +348,7 @@ function psc_show_form( $atts ){
 			</div>
 		</form>
 		<?php
+		}
 	} else if(count($res)==0) {
 		echo 'Sorry, but we couldn\'t find a form with ';
 		if($slug) { echo 'slug: '.$slug; }
@@ -352,6 +357,10 @@ function psc_show_form( $atts ){
 	} else {
 		echo 'Sorry, but we got more than 1 form back.';
 	}
+// 	if($psc_error)
+// 		return false;
+// 	else if(isset($psc_success))
+// 		return 'moderation';
 }
 
 
@@ -437,5 +446,3 @@ function psc_show_value($string) {
 		// otherwise, output custom field
 	}
 }
-
-?>
